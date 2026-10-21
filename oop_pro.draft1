@@ -1,0 +1,175 @@
+import random
+import pickle
+
+class User:
+    def __init__(self):
+        self.name = ""
+        self.id = random.randint(1, 10000000)
+        self.age = ""
+        self.gender = ""
+        self.height = ""
+        self.weight = ""
+        self.email = ""
+        self.password = ""
+        self.fitness_tests = []
+
+    def create_profile(self):
+      self.name = input("Digit your name: ")
+      self.age = input("Digit your age: ")
+      while True:
+        self.gender = input("Indicate your gender (Male/Female): ")
+        if self.gender.upper() in ["MALE", "M", "FEMALE", "F"]:
+            print()
+            break
+        else:
+            print("Please enter either Male or Female\n")
+            self.height = input("Enter your height: ")
+            self.weight = input("Enter your weight: ")
+            self.email = input("Digit your email: ")
+            self.password = input("Create a password: ")
+
+    def display_users_info(self):
+        print("\n USER DATA")
+        print("ID: ", self.id)
+        print("Name: ", self.name)
+        print("Gender: ", self.gender)
+        print("Age: ", self.age)
+        print("Height: ", self.height, "cm")
+        print("Weight: ", self.weight, "kg")
+        print("Email: ", self.email)
+        print("Total Tests Recorded: ", len(self.fitness_tests))
+
+class FitnessTest:
+    def __init__(self): 
+        self.test_date = ""
+        self.push_ups = 0
+        self.sit_ups = 0
+        self.bench_press_1rm = 0.0
+        self.leg_press_1rm = 0.0
+        self.sit_and_reach = 0.0
+        self.run_distance = 0.0
+
+    def input_scores(self):
+        print("FITNESS TEST SCORES")
+        self.test_date = input("Enter test date (DD/MM/YYYY): ").strip()
+        self.push_ups = int(input("Enter number of push-ups: "))
+        self.sit_ups = int(input("Enter number of sit-ups: "))
+        self.bench_press_1rm = float(input("Enter bench press 1RM (kg): "))
+        self.leg_press_1rm = float(input("Enter leg press 1RM (kg): "))
+        self.sit_and_reach = float(input("Enter sit and reach score (cm): "))
+        self.run_distance = float(input("Enter 12-min run distance (meters): "))
+
+    def display_test(self):
+        print(f"\n  [Fecha: {self.test_date}]")
+        print(f "Push-ups: {self.push_ups} | Sit-ups: {self.sit_ups}")
+        print(f"Bench Press 1RM: {self.bench_press_1rm} kg | Leg Press 1RM: {self.leg_press_1rm} kg")
+        print(f"Sit & Reach: {self.sit_and_reach} cm | Distance: {self.run_distance} m")
+
+
+
+myUserList = []
+try:
+    userfile = open("mybookuser.dat", "rb")
+    while True:
+        try:
+            u_obj = pickle.load(userfile)
+            myUserList.append(u_obj)
+        except EOFError:
+            break
+    userfile.close()
+    print(f"{len(myUserList)} uploaded from 'mybookuser.dat'.")
+except FileNotFoundError:
+    print("'mybookuser.dat'not found. New one will be created when saved.")
+
+
+current_user = None 
+while True:
+    if current_user is None:
+        print("\n" + "=" * 40)
+        print("FITADVISOR / AXIS SYSTEM")
+        print("=" * 40)
+        print("1. Register New User")
+        print("2. Log In")
+        print("3. Exit")
+
+        choice = input("Enter option (1-3): ")
+
+        if choice == "1":
+            usr = User()
+            usr.create_profile()
+            myUserList.append(usr)
+
+            userfile1 = open("mybookuser.dat", "ab")
+            pickle.dump(usr, userfile1)
+            userfile1.close()
+            print(f"\n ¡User '{usr.name}' registered and saved!")
+
+        elif choice == "2":
+            print("\n--- LOG IN ---")
+            email_in = input("Enter your email: ")
+            password_in = input("Enter your password: ")
+
+            found = False
+            for u in myUserList:
+                if u.email == email_in and u.password == password_in:
+                    current_user = u
+                    found = True
+                    print(f"\n Login successful! Welcome, {current_user.name}.")
+                    break
+
+            if not found:
+                print("\n Invalid email or password.")
+
+        elif choice == "3":
+            print("\n Exiting program. Goodbye!")
+            break
+
+        else:
+            print("Invalid option. Try again.")
+
+  
+    else:
+        print("\n" + "=" * 40)
+        print(f" DASHBOARD | User: {current_user.name}")
+        print("=" * 40)
+        print("1. Display My Info")
+        print("2. Record Fitness Test")
+        print("3. Display My Fitness Tests")
+        print("4. Log Out")
+        print("5. Exit Program")
+
+        user_choice = input("Enter choice (1-5): ")
+        if user_choice == "1":
+            current_user.display_users_info()
+
+        elif user_choice == "2":
+            ft = FitnessTest()
+            ft.input_scores()
+            current_user.fitness_tests.append(ft)
+
+            userfile_write = open("mybookuser.dat", "wb")
+            for u in myUserList:
+                pickle.dump(u, userfile_write)
+            userfile_write.close()
+
+            print(f"\n Test registered and saved for {current_user.name}!")
+
+        elif user_choice == "3":
+            print(f"\n--- {current_user.name.upper()}'s registered tests.")
+            if not current_user.fitness_tests:
+                print(" No test records found.")
+            else:
+                for idx, t in enumerate(current_user.fitness_tests, 1):
+                    print(f"\nTest #{idx}:")
+                    t.display_test()
+
+        elif user_choice == "4":
+            print(f"\nLogging out {current_user.name}...")
+            current_user = None
+
+        elif user_choice == "5":
+            print("\nExiting program. Goodbye!")
+            break
+
+        else:
+            print("Invalid choice.")
