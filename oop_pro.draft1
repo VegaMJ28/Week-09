@@ -134,9 +134,10 @@ while True:
         print("=" * 40)
         print("1. Display My Info")
         print("2. Record Fitness Test")
-        print("3. Display My Fitness Tests")
-        print("4. Log Out")
-        print("5. Exit Program")
+        print("3. My Workout Routine")
+        print("4. Display My Fitness Tests")
+        print("5. Log Out")
+        print("6. Exit Program")
 
         user_choice = input("Enter choice (1-5): ")
         if user_choice == "1":
@@ -155,6 +156,11 @@ while True:
             print(f"\n Test registered and saved for {current_user.name}!")
 
         elif user_choice == "3":
+
+
+
+
+        elif user_choice == "4":
             print(f"\n--- {current_user.name.upper()}'s registered tests.")
             if not current_user.fitness_tests:
                 print(" No test records found.")
@@ -163,11 +169,11 @@ while True:
                     print(f"\nTest #{idx}:")
                     t.display_test()
 
-        elif user_choice == "4":
+        elif user_choice == "5":
             print(f"\nLogging out {current_user.name}...")
             current_user = None
 
-        elif user_choice == "5":
+        elif user_choice == "6":
             print("\nExiting program. Goodbye!")
             break
 
